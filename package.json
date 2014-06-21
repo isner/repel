@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "mocha": "~1.14.0",
+    "assert": "~0.4.9"
+  },
+  "dependencies": {
+    "jade": "~0.35.0",
+    "connect": "~2.11.0"
+  }
+}
