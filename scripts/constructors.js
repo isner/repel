@@ -171,12 +171,12 @@ function Player(element) {
       // Before testing, update the charge count
     this.center.innerHTML = this.charge;
 
-    console.log('%c this.charge: ', 'background-color: #000; color: #FFF;', this.charge);
-    
+    // console.log('%c this.charge: ', 'background-color: #000; color: #FFF;', this.charge);
+
 
       // Test the charge count
     return this.self.classList.contains('overload');
-    
+
   };
 
   this.triggerOverload = function () {
@@ -238,7 +238,7 @@ function Ball(field) {
 
   /**
    * Moves the ball.
-   * @param {Array} vector  
+   * @param {Array} vector
    * - The x and y values to move the ball per unit of time.
    *   Values are according to a web-document's cartesian system
    *   (positive x equals down, positive y equals right).
@@ -255,7 +255,7 @@ function Ball(field) {
       // Use supplied vector param, if supplied
       // Otherwise use default vector
     vector = vector ? vector : defaultVectors[this.bankIndex];
-      
+
     this.self.style.left = (this.position.left + vector[0]) + 'px';
     this.self.style.top = (this.position.top + vector[1]) + 'px';
     this.position.left = parseFloat(this.self.style.left);
@@ -399,12 +399,12 @@ function BallExplosion(ball) {
   this.element.style.height = ball.balloon.size + 'px';
   this.element.style.width = ball.balloon.size + 'px';
   this.element.style.borderRadius = ball.balloon.radius + 'px';
-  
+
   var that = this;
   this.destroy = function () {
     field.self.removeChild(that.element);
   };
-  
+
   setTimeout(this.destroy, 400);
 
 }
