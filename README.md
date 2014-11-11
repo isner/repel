@@ -1,6 +1,10 @@
-# Repel
+# Repel (alpha)
 
 A ball-deflecting game of skill for the browser
+
+## Requires
+
+- [nodejs](http://nodejs.org)
 
 ## Installation
 
@@ -12,3 +16,5 @@ In your shell:
     $ serve -p 1982
 
 In your browser, visit `http://localhost:1982/views/index.jade`
+
+Enjoy!
