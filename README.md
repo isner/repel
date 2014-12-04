@@ -1,20 +1,16 @@
 # Repel (alpha)
 
-A ball-deflecting game of skill for the browser
-
-## Requires
-
-- [nodejs](http://nodejs.org)
+A ball-deflecting game of skill for the browser (requires [nodejs](http://nodejs.org).
 
 ## Installation
 
-In your shell:
+```bash
+# repo is currently private, sorry
+$ git clone https://bitbucket.org/isner/repel.git
+$ npm i
+$ node build
+```
 
-    $ git clone https://bitbucket.org/isner/repel.git
-    $ npm install
-    $ stylus styles
-    $ serve -p 1982
-
-In your browser, visit `http://localhost:1982/views/index.jade`
+Open `index.html` in your browser.
 
 Enjoy!

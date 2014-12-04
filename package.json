@@ -1,11 +1,16 @@
 {
   "name": "repel",
   "version": "0.0.2",
+  "repository": {
+    "url": "https://bitbucket.org/isner/repel.git",
+    "type": "git"
+  },
   "dependencies": {
-    "jade": "^1.7.0"
+    "duo": "^0.8.10",
+    "jade": "^1.7.0",
+    "stylus": "^0.49.3"
   },
   "devDependencies": {
-    "serve": "^1.4.0",
-    "stylus": "^0.49.3"
+    "serve": "^1.4.0"
   }
 }
