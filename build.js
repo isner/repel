@@ -21,7 +21,9 @@ var html = jade.renderFile(jadeFile, {
   pretty: true,
 });
 
-fs.writeFile('index.html', html, function (err) {
+var htmlOut = 'index.html';
+
+fs.writeFile(htmlOut, html, function (err) {
   if (err) throw err;
 });
 
@@ -46,8 +48,8 @@ fs.readdir(stylesDir, function (err, files) {
           filename: file
         }, function (err, css) {
           if (err) throw err;
-          var dest = path.join(stylesDir, path.basename(file, '.styl')) + '.css';
-          fs.writeFile(dest, css, function (err) {
+          var cssOut = path.join(stylesDir, path.basename(file, '.styl')) + '.css';
+          fs.writeFile(cssOut, css, function (err) {
             if (err) throw err;
           });
         });
