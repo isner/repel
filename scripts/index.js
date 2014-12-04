@@ -1,15 +1,29 @@
-/* global config,player,field,scoreboard */
 
-  // Set field level to default
+/**
+ * Module dependencies.
+ */
+
+var config = require('./config');
+var constructors = require('./constructors');
+var Healthbar = constructors.Healthbar;
+var LaunchSession = require('./launch-session');
+var Ball = constructors.Ball;
+var BallExplosion = constructors.BallExplosion;
+var field = require('./prepare-game').field;
+var scoreboard = require('./prepare-game').scoreboard;
+var healthbarElem = require('./prepare-game').healthbarElem;
+var player = require('./prepare-game').player;
+
+// Set field level to default
 field.levelNum = config.startLevel;
 
-  // Message shows upcoming level number
+// Message shows upcoming level number
 field.nextLevMsg.innerHTML = field.levelNum + 1;
 
-  // User clicks to continue
+// User clicks to continue
 field.self.addEventListener('click', startLevel);
 
-  // Monitor player's overload charges
+// Monitor player's overload charges
 var checkOverloadId = setInterval(function () {
   if (player.isOverloaded()) {
     clearInterval(checkOverloadId);
@@ -17,8 +31,7 @@ var checkOverloadId = setInterval(function () {
   }
 }, 1000 / 30);
 
-
-//------------------------------------------------------
+var healthbar, launchSession;
 
 function startLevel() {
 
@@ -129,10 +142,10 @@ function launchSequence() {
               // Count it!
             scoreboard.increaseScore(1);
             // console.log('%c player.isOverloaded(): ', 'background-color: #000; color: #FFF;', player.isOverloaded());
-            
+
             if (!player.isOverloaded()) {
               console.log('charge added');
-              player.addCharge(); 
+              player.addCharge();
             }
               // Play sound
             field.scoreSound();

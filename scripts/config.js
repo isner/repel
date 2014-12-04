@@ -1,5 +1,5 @@
 
-var config = {
+module.exports = {
 
   dimension: 0, // px, default: 0
 

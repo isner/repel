@@ -12,5 +12,8 @@
   },
   "devDependencies": {
     "serve": "^1.4.0"
+  },
+  "scripts": {
+    "postinstall": "make"
   }
 }

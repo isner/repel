@@ -1,4 +1,5 @@
 {
+  "laxbreak": true,
   "node": true,
   "strict": false
 }

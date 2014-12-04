@@ -6,54 +6,69 @@
 var stylus = require('stylus');
 var jade = require('jade');
 var path = require('path');
+var Duo = require('duo');
 var fs = require('fs');
 
+var buildDir = 'build';
+
 /**
- * Render jade.
- *
- * Uses a single file as entry point.
+ * Build js.
  */
 
-var jadeFile = 'views/index.jade';
-
-var html = jade.renderFile(jadeFile, {
-  filename: jadeFile,
-  pretty: true,
-});
-
-var htmlOut = 'index.html';
-
-fs.writeFile(htmlOut, html, function (err) {
+Duo(__dirname)
+.entry('scripts/index.js')
+.write(function (err) {
   if (err) throw err;
-});
 
-/**
- * Render stylus.
- *
- * Handles only a single level deep in the
- * designated style-containing directory.
- * If a more complex directory structure
- * becomes necessary for styles, use a
- * recursive directory scan.
- */
+  /**
+   * Render jade.
+   *
+   * Uses a single file as entry point.
+   */
 
-var stylesDir = 'styles';
+  var jadeFile = 'views/index.jade';
 
-fs.readdir(stylesDir, function (err, files) {
-  files.forEach(function (file) {
-    if (path.extname(file) == '.styl') {
-      fs.readFile(path.join(stylesDir, file), 'utf-8', function (err, data) {
-        if (err) throw err;
-        stylus.render(data, {
-          filename: file
-        }, function (err, css) {
+  var html = jade.renderFile(jadeFile, {
+    filename: jadeFile,
+    pretty: true,
+  });
+
+  var htmlOut = path.join(buildDir, 'index.html');
+
+  fs.writeFile(htmlOut, html, function (err) {
+    if (err) throw err;
+  });
+
+  /**
+   * Render stylus.
+   *
+   * Handles only a single level deep in the
+   * designated style-containing directory.
+   * If a more complex directory structure
+   * becomes necessary for styles, use a
+   * recursive directory scan.
+   */
+
+  var stylesDir = 'styles';
+
+  fs.mkdirSync(path.join(buildDir, stylesDir));
+
+  fs.readdir(stylesDir, function (err, files) {
+    files.forEach(function (file) {
+      if (path.extname(file) == '.styl') {
+        fs.readFile(path.join(stylesDir, file), 'utf-8', function (err, data) {
           if (err) throw err;
-          var cssOut = path.join(stylesDir, path.basename(file, '.styl')) + '.css';
-          fs.writeFile(cssOut, css, function (err) {
+          var opts = { filename: file };
+          stylus.render(data, opts, function (err, css) {
             if (err) throw err;
+            var output = path.join('build', stylesDir, path.basename(file, '.styl')) + '.css';
+            fs.writeFile(output, css, function (err) {
+              if (err) throw err;
+            });
           });
         });
-      });
-    }
+      }
+    });
   });
+
 });

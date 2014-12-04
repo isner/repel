@@ -1,3 +1,3 @@
-node_modules/
-**/*.css
-index.html
+build
+components
+node_modules
