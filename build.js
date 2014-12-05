@@ -3,6 +3,7 @@
  * Module dependencies.
  */
 
+var toJs = require('html-to-js');
 var stylus = require('stylus');
 var jade = require('jade');
 var path = require('path');
@@ -21,9 +22,8 @@ Duo(__dirname)
   if (err) throw err;
 
   /**
-   * Render jade.
-   *
-   * Uses a single file as entry point.
+   * Render jade into `index.html`.
+   * Convert `index.html` into `index.js`.
    */
 
   var jadeFile = 'views/index.jade';
@@ -34,8 +34,13 @@ Duo(__dirname)
   });
 
   var htmlOut = path.join(buildDir, 'index.html');
+  var jsOut = path.join(buildDir, 'index.js');
 
   fs.writeFile(htmlOut, html, function (err) {
+    if (err) throw err;
+  });
+
+  fs.writeFile(jsOut, toJs(html), function (err) {
     if (err) throw err;
   });
 
