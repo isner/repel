@@ -1,4 +1,4 @@
-# Repel 0.1.0 (alpha)
+# Repel 0.2.0 (alpha)
 
 A ball-deflecting game of skill for the browser (requires [nodejs](http://nodejs.org).
 
