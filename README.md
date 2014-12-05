@@ -1,12 +1,11 @@
-# Repel 0.2.0 (alpha)
+# Repel (Alpha)
 
-A ball-deflecting game of skill for the browser (requires [nodejs](http://nodejs.org).
+A ball-deflecting game of skill for the browser (requires [nodejs](http://nodejs.org)).
 
 ## Installation
 
 ```bash
-# repo is currently private, sorry
-$ git clone https://bitbucket.org/isner/repel.git
+$ git clone https://bitbucket.org/isner/repel.git#master
 $ npm i
 ```
 
