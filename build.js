@@ -18,6 +18,7 @@ var buildDir = 'build';
 
 Duo(__dirname)
 .entry('scripts/index.js')
+.buildTo(buildDir)
 .write(function (err) {
   if (err) throw err;
 
@@ -66,7 +67,7 @@ Duo(__dirname)
           var opts = { filename: file };
           stylus.render(data, opts, function (err, css) {
             if (err) throw err;
-            var output = path.join('build', stylesDir, path.basename(file, '.styl')) + '.css';
+            var output = path.join(buildDir, stylesDir, path.basename(file, '.styl')) + '.css';
             fs.writeFile(output, css, function (err) {
               if (err) throw err;
             });
