@@ -5,3 +5,7 @@ default:
 	node build
 	cp -r sounds build/sounds
 	cp -r images build/images
+
+.PHONY: clean
+clean:
+	rm -rf components node_modules
