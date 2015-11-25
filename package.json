@@ -1,12 +1,17 @@
 {
   "name": "repel",
-  "version": "0.2.0",
+  "version": "1.0.0",
+  "author": "Matt Isner <isnerms@gmail.com>",
   "repository": {
-    "url": "https://bitbucket.org/isner/repel.git",
+    "url": "git@bitbucket.org:isner/repel.git",
     "type": "git"
   },
-  "dependencies": {
+  "devDependencies": {
     "duo": "^0.8.10",
+    "fs-extra": "^0.26.2",
+    "gulp": "^3.9.0",
+    "gulp-jade": "^1.1.0",
+    "gulp-stylus": "^2.1.0",
     "html-to-js": "0.0.1",
     "jade": "^1.7.0",
     "stylus": "^0.49.3"

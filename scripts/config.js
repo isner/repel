@@ -1,19 +1,25 @@
 
 module.exports = {
 
-  dimension: 0, // px, default: 0
+  dimension: 0,     // px, default: 0
 
   player: {
-    diameter: 50, // px, default: 50
-    radius: 25, // px, default: 25
+    diameter: 50,   // px, default: 50
+    radius: 25,     // px, default: 25
     maxCharge: 5
   },
 
-    // Test mode
+  /**
+   * Test mode.
+   */
+
   launchRate: 1500,
   totalBalls: 15,
 
-    // Melissa mode
+  /**
+   * Melissa mode.
+   */
+
   // launchRate: 400,
   // totalBalls: 50,
 
@@ -31,9 +37,9 @@ module.exports = {
 
   /**
    * Generates a random integer between min & max.
-   * @param   {Integer}  min  Lowest desired result.
-   * @param   {Integer}  max  Highest desired result.
-   * @return  {Integer}       The random result.
+   * @param   {Number}  min  Lowest desired result.
+   * @param   {Number}  max  Highest desired result.
+   * @return  {Number}       The random result.
    */
   randomNum: function (min, max) {
     return Math.random() * (max - min) + min;
