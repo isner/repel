@@ -121,9 +121,6 @@ div.bank.left {
   -o-transform: scale(1.05, 1.05);
   transform: scale(1.05, 1.05);
 }
-#player.overload {
-  background-color: #3d55ff;
-}
 #player .center {
   position: absolute;
   top: 5px;

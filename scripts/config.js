@@ -13,8 +13,8 @@ module.exports = {
    * Test mode.
    */
 
-  launchRate: 1500,
-  totalBalls: 15,
+  launchRate: 800,
+  totalBalls: 3,
 
   /**
    * Melissa mode.

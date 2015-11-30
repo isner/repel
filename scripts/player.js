@@ -11,8 +11,19 @@ var config = require('./config');
 
 module.exports = Player;
 
-function Player(element) {
-  this.self = element;
+/**
+ * Creates a new instance of `Player`.
+ *
+ * Requires an element matching '#player'.
+ */
+
+function Player() {
+  this.self = document.getElementById('player');
+
+  if (!this.self) {
+    throw new Error('unable to find `#player`');
+  }
+
   this.center = document.querySelector('#player .center');
 
   this.diameter = config.player.diameter;
@@ -42,46 +53,6 @@ function Player(element) {
     player.self.style.left = (event.clientX - player.radius) + 'px';
     player.position.top = event.clientY;
     player.position.left = event.clientX;
-  };
-
-  this.addCharge = function () {
-
-      // Increment the charge
-    this.charge = parseInt(this.center.innerHTML, 10) + 1;
-
-      // If charge is sufficient, trigger overload!
-    if (this.charge === config.player.maxCharge) {
-      this.triggerOverload();
-    }
-
-  };
-
-  this.isOverloaded = function () {
-
-      // Before testing, update the charge count
-    this.center.innerHTML = this.charge;
-
-    // console.log('%c this.charge: ', 'background-color: #000; color: #FFF;', this.charge);
-
-
-      // Test the charge count
-    return this.self.classList.contains('overload');
-
-  };
-
-  this.triggerOverload = function () {
-
-    this.self.classList.add('overload');
-    var that = this;
-    var overloadDurationId = setInterval(function () {
-      if (that.charge === 0) {
-        clearInterval(overloadDurationId);
-        that.self.classList.remove('overload');
-        return;
-      }
-      that.charge -= 1;
-      player.center.innerHTML = that.charge;
-    }, 1000 / 1);
   };
 
 }

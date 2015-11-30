@@ -5,15 +5,25 @@
 
 module.exports = Field;
 
-function Field(element) {
-  this.self = element;
+/**
+ * Create a new instance of `Field`.
+ *
+ * Requires an element matching '#field'.
+ */
+
+function Field() {
+  this.self = document.getElementById('field');
   this.levelNum = null;
 
-    // User message
+  if (!this.self) {
+    throw new Error('unable to find `#field`');
+  }
+
+  // User message
   this.message = document.querySelector('div.message');
   this.nextLevMsg = document.querySelector('span.nextLevNum');
 
-    // Score sound
+  // Score sound
   this.scoreSoundVal = 1;
   this.scoreSound = function () {
     var audio = document.getElementById('sfx-beep-' + this.scoreSoundVal);
@@ -26,7 +36,7 @@ function Field(element) {
 
   };
 
-    // Miss sound
+  // Miss sound
   this.missSoundVal = 1;
   this.missSound = function () {
     var audio = document.getElementById('sfx-beep-high-' + this.missSoundVal);

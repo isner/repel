@@ -11,8 +11,19 @@ var config = require('./config');
 
 module.exports = Scoreboard;
 
-function Scoreboard(element) {
-  this.self = element;
+/**
+ * Create a new instance of `Scoreboard`.
+ *
+ * Requires an element matching '#scoreboard'.
+ */
+
+function Scoreboard() {
+  this.self = document.getElementById('scoreboard');
+
+  if (!this.self) {
+    throw new Error('unable to find `#scoreboard`');
+  }
+
   this.ballNum = document.querySelector('span.ballNum');
   this.ballTot = document.querySelector('span.ballTot');
   this.levelNum = document.querySelector('span.levNum');
