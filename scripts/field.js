@@ -22,6 +22,8 @@ function Field() {
   // User message
   this.message = document.querySelector('div.message');
   this.nextLevMsg = document.querySelector('span.nextLevNum');
+  this.topRow = this.message.querySelector('.top-row');
+  this.bottomRow = this.message.querySelector('.bottom-row');
 
   // Score sound
   this.scoreSoundVal = 1;

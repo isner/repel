@@ -32,8 +32,15 @@ function LaunchSession(game) {
         // Show the continue message
         game.field.message.classList.remove('hide');
 
-        // Bind 'click' event to start level
-        game.field.self.addEventListener('click', startLevel(game));
+        if (game.healthbar.isEmpty()) {
+          // Game over
+          game.field.topRow.innerHTML = 'Game over';
+          game.field.bottomRow.innerHTML = 'Refresh the page to try again';
+        }
+        else {
+          // Bind 'click' event to start level
+          game.field.self.addEventListener('click', startLevel(game));
+        }
 
         clearInterval(checkForClear);
       }

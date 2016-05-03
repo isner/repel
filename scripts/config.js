@@ -14,7 +14,7 @@ module.exports = {
    */
 
   launchRate: 800,
-  totalBalls: 3,
+  totalBalls: 10,
 
   /**
    * Melissa mode.

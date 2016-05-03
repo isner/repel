@@ -15,7 +15,7 @@ module.exports = startLevel;
  */
 
 function startLevel(game) {
-  return function () {
+  function start() {
     game.field.levelNum ++;
 
     // Increase the thrust
@@ -23,7 +23,7 @@ function startLevel(game) {
     console.log('config.thrust: ', game.config.thrust);
 
     // Increase the launch rate
-    game.config.launchRate -= 20;
+    game.config.launchRate -= 40;
     console.log('config.launchRate: ', game.config.launchRate);
 
     // Prepare the scoreboard
@@ -42,10 +42,12 @@ function startLevel(game) {
     game.field.nextLevMsg.innerHTML = game.field.levelNum + 1;
 
     // Unbind the continue 'click' event on the field
-    game.field.self.removeEventListener('click');
+    game.field.self.removeEventListener('click', start);
 
     // Start a launch session
     game.launchSession = new LaunchSession(game);
     game.launchSession.start();
-  };
+  }
+
+  return start;
 }

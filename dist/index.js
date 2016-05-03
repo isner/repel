@@ -120,7 +120,7 @@ module.exports = startLevel;
  */
 
 function startLevel(game) {
-  return function () {
+  function start() {
     game.field.levelNum ++;
 
     // Increase the thrust
@@ -128,7 +128,7 @@ function startLevel(game) {
     console.log('config.thrust: ', game.config.thrust);
 
     // Increase the launch rate
-    game.config.launchRate -= 20;
+    game.config.launchRate -= 40;
     console.log('config.launchRate: ', game.config.launchRate);
 
     // Prepare the scoreboard
@@ -147,12 +147,14 @@ function startLevel(game) {
     game.field.nextLevMsg.innerHTML = game.field.levelNum + 1;
 
     // Unbind the continue 'click' event on the field
-    game.field.self.removeEventListener('click');
+    game.field.self.removeEventListener('click', start);
 
     // Start a launch session
     game.launchSession = new LaunchSession(game);
     game.launchSession.start();
-  };
+  }
+
+  return start;
 }
 
 }, {"./launch-session":4,"./healthbar":5}],
@@ -191,8 +193,15 @@ function LaunchSession(game) {
         // Show the continue message
         game.field.message.classList.remove('hide');
 
-        // Bind 'click' event to start level
-        game.field.self.addEventListener('click', startLevel(game));
+        if (game.healthbar.isEmpty()) {
+          // Game over
+          game.field.topRow.innerHTML = 'Game over';
+          game.field.bottomRow.innerHTML = 'Refresh the page to try again';
+        }
+        else {
+          // Bind 'click' event to start level
+          game.field.self.addEventListener('click', startLevel(game));
+        }
 
         clearInterval(checkForClear);
       }
@@ -592,7 +601,7 @@ module.exports = {
    */
 
   launchRate: 800,
-  totalBalls: 3,
+  totalBalls: 10,
 
   /**
    * Melissa mode.
@@ -904,6 +913,8 @@ function Field() {
   // User message
   this.message = document.querySelector('div.message');
   this.nextLevMsg = document.querySelector('span.nextLevNum');
+  this.topRow = this.message.querySelector('.top-row');
+  this.bottomRow = this.message.querySelector('.bottom-row');
 
   // Score sound
   this.scoreSoundVal = 1;
