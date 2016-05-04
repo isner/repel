@@ -14,4 +14,4 @@ game.field.levelNum = game.config.startLevel;
 game.field.nextLevMsg.innerHTML = game.field.levelNum + 1;
 
 // User clicks to continue
-game.field.self.addEventListener('click', startLevel(game));
+game.field.el.addEventListener('click', startLevel(game));

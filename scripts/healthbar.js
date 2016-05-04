@@ -4,8 +4,8 @@ var globesSelector = '.globe';
 module.exports = Healthbar;
 
 function Healthbar(element) {
-  this.self = element;
-  this.globes = document.querySelectorAll(globesSelector, this.self);
+  this.el = element;
+  this.globes = document.querySelectorAll(globesSelector, this.el);
 }
 
 Healthbar.prototype.replenishAll = function () {

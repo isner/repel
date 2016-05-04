@@ -10,41 +10,48 @@ body
   margin 0
   padding 0
 
+.hidden
+  display none
+
 /**
  * Field
  */
 
-#field
-  position relative
-  overflow hidden
-  z-index 0
-#field:hover
-  cursor none
+.cage
+  width 100vw
+  #field
+    position relative
+    margin auto
+    overflow hidden
+    z-index 0
+  #field:hover
+    cursor none
 
 /**
  * Player message
  */
 
-div.message
+.vertical-center
   position absolute
   top 39%
-  left 35%
-  color #052429
-  z-index 0
-  -webkit-transition display 1s linear
-  -moz-transition display 1s linear
-  -o-transition display 1s linear
-  transition display 1s linear
-div.message.hide
-  display none
-div.message div.top-row
-  text-align center
-  font-size 3em
-div.message div.bottom-row
-  text-align center
-  font-size 1em
-div.message span.nextLevNum
-  padding-left 0.4em
+  width 100%
+  .message
+    color #052429
+    z-index 0
+    -webkit-transition display 1s linear
+    -moz-transition display 1s linear
+    -o-transition display 1s linear
+    transition display 1s linear
+    .top-row
+      text-align center
+      font-size 3em
+    .bottom-row
+      text-align center
+      font-size 1em
+    .nextLevNum
+      padding-left 0.4em
+    &.hide
+      display none
 
 /**
  * Scoreboard
@@ -65,27 +72,27 @@ div.message span.nextLevNum
  * Banks
  */
 
-div.bank
+.bank
   position absolute
   background-color #CCC
-div.bank.top, div.bank.bottom
+.bank.top, .bank.bottom
   height 20px
   width 100%
   z-index 10
-div.bank.left, div.bank.right
+.bank.left, .bank.right
   height 100%
   width 20px
   z-index 9
-div.bank.top
+.bank.top
   background-color #FFC000
   top 0
-div.bank.right
+.bank.right
   background-color #74A7C6
   right 0
-div.bank.bottom
+.bank.bottom
   background-color #59A41A
   bottom 0
-div.bank.left
+.bank.left
   background-color #A55500
   left 0
 
@@ -94,7 +101,6 @@ div.bank.left
  */
 
 #player
-  display none
   position absolute
   top 0
   left 0
@@ -155,7 +161,7 @@ div.bank.left
  * Ball
  */
 
-div.ball-anchor
+.ball-anchor
   position absolute
   height 1px
   width 1px
@@ -164,27 +170,27 @@ div.ball-anchor
   bottom 0px
   left 0px
   z-index 100
-div.balloon
+.balloon
   position absolute
   opacity 1
   -webkit-transition all 400ms ease
   -moz-transition all 400ms ease
   -o-transition all 400ms ease
   transition all 400ms ease
-div.balloon.bank0
+.balloon.bank0
   background-color #FFC000
-div.balloon.bank1
+.balloon.bank1
   background-color #74A7C6
-div.balloon.bank2
+.balloon.bank2
   background-color #59A41A
-div.balloon.bank3
+.balloon.bank3
   background-color #A55500
 
-div.balloon.subtle
+.balloon.subtle
   opacity 0.25
-div.balloon.fadeOut
+.balloon.fadeOut
   opacity 0
-div.balloon.explode
+.balloon.explode
   opacity 1
   -webkit-transform scale(1.5, 1.5)
   -moz-transform scale(1.5, 1.5)
@@ -195,7 +201,7 @@ div.balloon.explode
  * BallExplosion
  */
 
-div.explosion
+.explosion
   position absolute
   background-image url('images/explosion-sprite.png')
   background-position-x -20px

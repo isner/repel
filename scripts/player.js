@@ -3,7 +3,13 @@
  * Module dependencies.
  */
 
+var Emitter = require('component/emitter');
+var classes = require('component/classes');
+var events = require('component/events');
+var query = require('component/query');
 var config = require('./config');
+
+var HIDDEN_CLASS = 'hidden';
 
 /**
  * Expose `Player`.
@@ -18,41 +24,37 @@ module.exports = Player;
  */
 
 function Player() {
-  this.self = document.getElementById('player');
-
-  if (!this.self) {
-    throw new Error('unable to find `#player`');
-  }
-
-  this.center = document.querySelector('#player .center');
+  this.el = query('#player');
+  this.center = query('.center', this.el);
 
   this.diameter = config.player.diameter;
-  this.self.style.width =
-  this.self.style.height =
-    this.diameter + 'px';
-
   this.radius = this.diameter / 2;
-  this.self.style.borderRadius = this.radius + 'px';
+
+  this.el.style.width = this.diameter + 'px';
+  this.el.style.height = this.diameter + 'px';
+  this.el.style.borderRadius = this.radius + 'px';
 
   this.position = {};
   this.velocity = {};
-  this.charge = 1;
-
-  var player = this;
-
-  this.show = function () {
-    player.self.style.display = 'block';
-  };
-
-  this.hide = function () {
-    player.self.style.display = 'none';
-  };
-
-  this.move = function (event) {
-    player.self.style.top = (event.clientY - player.radius) + 'px';
-    player.self.style.left = (event.clientX - player.radius) + 'px';
-    player.position.top = event.clientY;
-    player.position.left = event.clientX;
-  };
-
 }
+
+/**
+ * Mixin `Emitter`.
+ */
+
+Emitter(Player.prototype);
+
+Player.prototype.show = function () {
+  classes(this.el).remove(HIDDEN_CLASS);
+};
+
+Player.prototype.hide = function () {
+  classes(this.el).add(HIDDEN_CLASS);
+};
+
+Player.prototype.moveTo = function (coords) {
+  this.el.style.top = (coords.y - this.radius).toString() + 'px';
+  this.position.top = coords.y;
+  this.el.style.left = (coords.x - this.radius).toString() + 'px';
+  this.position.left = coords.x;
+};

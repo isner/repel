@@ -4,6 +4,7 @@
  */
 
 var BallExplosion = require('./ball-explosion');
+var classes = require('component/classes');
 var Ball = require('./ball');
 
 /**
@@ -39,7 +40,7 @@ function LaunchSession(game) {
         }
         else {
           // Bind 'click' event to start level
-          game.field.self.addEventListener('click', startLevel(game));
+          game.field.el.addEventListener('click', startLevel(game));
         }
 
         clearInterval(checkForClear);
@@ -87,9 +88,9 @@ function launchSequence(game) {
     // Ball collides with player
     if (ball.collide(game.player)) {
 
-      game.player.self.classList.add('opac80');
+      classes(game.player.el).add('opac80');
       var playerFlash = setTimeout(function () {
-        game.player.self.classList.remove('opac80');
+        classes(game.player.el).remove('opac80');
       }, 50);
 
       // Stop the initial movement loop

@@ -17,7 +17,7 @@ function BallExplosion(ball, game) {
   this.element.classList.add('explosion');
   this.radius = ball.balloon.radius;
 
-  game.field.self.appendChild(this.element);
+  game.field.el.appendChild(this.element);
 
   this.element.style.top = ball.position.top - this.radius + 'px';
   this.element.style.left = ball.position.left - this.radius + 'px';
@@ -27,7 +27,7 @@ function BallExplosion(ball, game) {
 
   var that = this;
   this.destroy = function () {
-    game.field.self.removeChild(that.element);
+    game.field.el.removeChild(that.element);
   };
 
   setTimeout(this.destroy, 400);

@@ -19,8 +19,8 @@ module.exports = Ball;
  */
 
 function Ball(field) {
-  this.self = document.createElement('div');
-  this.self.classList.add('ball-anchor');
+  this.el = document.createElement('div');
+  this.el.classList.add('ball-anchor');
 
   this.lifespan = config.lifespan;
   this.position = {};
@@ -35,25 +35,25 @@ function Ball(field) {
 
   // Position the ball in the bank
   if (this.bankIndex === 0) { // Top
-    this.self.style.top = '0px';
-    this.self.style.left = this.bankOffset + 'px';
+    this.el.style.top = '0px';
+    this.el.style.left = this.bankOffset + 'px';
 
   } else if (this.bankIndex === 1) { // Right
-    this.self.style.top = this.bankOffset + 'px';
-    this.self.style.left = this.field.dimension + 'px';
+    this.el.style.top = this.bankOffset + 'px';
+    this.el.style.left = this.field.dimension + 'px';
 
   } else if (this.bankIndex === 2) { // Bottom
-    this.self.style.top = this.field.dimension + 'px';
-    this.self.style.left = this.bankOffset + 'px';
+    this.el.style.top = this.field.dimension + 'px';
+    this.el.style.left = this.bankOffset + 'px';
 
   } else if (this.bankIndex === 3) { // Left
-    this.self.style.top = this.bankOffset + 'px';
-    this.self.style.left = '0px';
+    this.el.style.top = this.bankOffset + 'px';
+    this.el.style.left = '0px';
 
   }
 
   // Insert ball into the field
-  this.field.self.appendChild(this.self);
+  this.field.el.appendChild(this.el);
 
   // Create a new balloon
   this.balloon = new Balloon(this);
@@ -80,10 +80,10 @@ Ball.prototype.move = function (vector) {
   // Otherwise use default vector
   vector = vector ? vector : defaultVectors[this.bankIndex];
 
-  this.self.style.left = (this.position.left + vector[0]) + 'px';
-  this.self.style.top = (this.position.top + vector[1]) + 'px';
-  this.position.left = parseFloat(this.self.style.left);
-  this.position.top = parseFloat(this.self.style.top);
+  this.el.style.left = (this.position.left + vector[0]) + 'px';
+  this.el.style.top = (this.position.top + vector[1]) + 'px';
+  this.position.left = parseFloat(this.el.style.left);
+  this.position.top = parseFloat(this.el.style.top);
 
 };
 
@@ -107,29 +107,26 @@ Ball.prototype.getVector = function (player) {
 };
 
 Ball.prototype.makeSubtle = function () {
-  this.balloon.self.classList.add('subtle');
+  this.balloon.el.classList.add('subtle');
 };
 
 Ball.prototype.explode = function () {
-  this.balloon.self.classList.add('explode');
+  this.balloon.el.classList.add('explode');
 };
 
 Ball.prototype.fadeOut = function () {
-  this.balloon.self.classList.add('fadeOut');
+  this.balloon.el.classList.add('fadeOut');
 };
 
 Ball.prototype.destroy = function () {
   // Remove the ball's HTMLElement
-  this.field.self.removeChild(this.self);
+  this.field.el.removeChild(this.el);
   // Clear the ball's movement intervalId
   clearInterval(this.initialMovementId);
   // Clear the ball's redirected movement intervalId
   clearInterval(this.redirectedMovementId);
   // Clear the ball's death timeoutId
   clearTimeout(this.deathId);
-  // Delete the object
-  delete this;
-
 };
 
 /**

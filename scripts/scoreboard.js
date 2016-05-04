@@ -3,6 +3,7 @@
  * Module dependencies.
  */
 
+var query = require('component/query');
 var config = require('./config');
 
 /**
@@ -18,16 +19,11 @@ module.exports = Scoreboard;
  */
 
 function Scoreboard() {
-  this.self = document.getElementById('scoreboard');
-
-  if (!this.self) {
-    throw new Error('unable to find `#scoreboard`');
-  }
-
-  this.ballNum = document.querySelector('span.ballNum');
-  this.ballTot = document.querySelector('span.ballTot');
-  this.levelNum = document.querySelector('span.levNum');
-  this.score = document.querySelector('span.score');
+  this.el = document.getElementById('scoreboard');
+  this.ballNum = query('span.ballNum');
+  this.ballTot = query('span.ballTot');
+  this.levelNum = query('span.levNum');
+  this.score = query('span.score');
 
   this.setTotalBallNum = function () {
     this.ballTot.innerHTML = '&nbsp;of&nbsp;' + config.totalBalls;

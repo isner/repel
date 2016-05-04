@@ -1,5 +1,14 @@
 
 /**
+ * Module dependencies.
+ */
+
+var Emitter = require('component/emitter');
+var classes = require('component/classes');
+var events = require('component/events');
+var query = require('component/query');
+
+/**
  * Expose `Field`.
  */
 
@@ -12,12 +21,13 @@ module.exports = Field;
  */
 
 function Field() {
-  this.self = document.getElementById('field');
+  this.el = query('#field');
   this.levelNum = null;
 
-  if (!this.self) {
-    throw new Error('unable to find `#field`');
-  }
+  this.events = events(this.el, this);
+  this.events.bind('mouseenter');
+  this.events.bind('mouseleave');
+  this.events.bind('mousemove');
 
   // User message
   this.message = document.querySelector('div.message');
@@ -52,3 +62,25 @@ function Field() {
   };
 
 }
+
+/**
+ * Mixin `Emitter`.
+ */
+
+Emitter(Field.prototype);
+
+Field.prototype.onmouseenter = function () {
+  this.emit('mouseenter');
+};
+
+Field.prototype.onmouseleave = function () {
+  this.emit('mouseleave');
+};
+
+Field.prototype.onmousemove = function (e) {
+  var field = this;
+  field.emit('mousemove', {
+    x: e.pageX - field.el.offsetLeft,
+    y: e.pageY - field.el.offsetTop
+  });
+};

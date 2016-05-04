@@ -42,7 +42,7 @@ function startLevel(game) {
     game.field.nextLevMsg.innerHTML = game.field.levelNum + 1;
 
     // Unbind the continue 'click' event on the field
-    game.field.self.removeEventListener('click', start);
+    game.field.el.removeEventListener('click', start);
 
     // Start a launch session
     game.launchSession = new LaunchSession(game);
