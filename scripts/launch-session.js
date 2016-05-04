@@ -35,7 +35,7 @@ LaunchSession.prototype.end = function () {
     // If field is clear of balls
     if (document.querySelectorAll('div.ball-anchor').length < 1) {
 
-      // Show the continue message
+      // Show the message
       game.field.message.classList.remove('hide');
 
       if (game.healthbar.isEmpty()) {
