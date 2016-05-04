@@ -2,12 +2,7 @@
 
 A ball-deflecting game of skill for the browser.
 
-## Installation
-
-```bash
-$ git clone https://bitbucket.org/isner/repel.git#master
-$ npm i
-```
+## Getting Started
 
 Open `dist/index.html` in your browser.
 
