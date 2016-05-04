@@ -14,40 +14,44 @@ var Ball = require('./ball');
 module.exports = LaunchSession;
 
 function LaunchSession(game) {
-  var startLevel = require('./start-level');
+  this.game = game;
+  this.startLevel = require('./start-level');
   this.ballNum = 0;
-
-  this.start = function () {
-    var sequence = launchSequence.bind(this, game);
-    this.self = setInterval(sequence, game.config.launchRate);
-  };
-
-  this.end = function () {
-    clearInterval(this.self);
-
-    var checkForClear = setInterval(function () {
-
-      // If field is clear of balls
-      if (document.querySelectorAll('div.ball-anchor').length < 1) {
-
-        // Show the continue message
-        game.field.message.classList.remove('hide');
-
-        if (game.healthbar.isEmpty()) {
-          // Game over
-          game.field.topRow.innerHTML = 'Game over';
-          game.field.bottomRow.innerHTML = 'Refresh the page to try again';
-        }
-        else {
-          // Bind 'click' event to start level
-          game.field.el.addEventListener('click', startLevel(game));
-        }
-
-        clearInterval(checkForClear);
-      }
-    }, 1000);
-  };
 }
+
+LaunchSession.prototype.start = function () {
+  var sequence = launchSequence.bind(this, this.game);
+  this.self = setInterval(sequence, this.game.config.launchRate);
+};
+
+LaunchSession.prototype.end = function () {
+  var self = this;
+  var game = this.game;
+
+  clearInterval(this.self);
+
+  var checkForClear = setInterval(function () {
+
+    // If field is clear of balls
+    if (document.querySelectorAll('div.ball-anchor').length < 1) {
+
+      // Show the continue message
+      game.field.message.classList.remove('hide');
+
+      if (game.healthbar.isEmpty()) {
+        // Game over
+        game.field.topRow.innerHTML = 'Game over';
+        game.field.bottomRow.innerHTML = 'Refresh the page to try again';
+      }
+      else {
+        // Bind 'click' event to start level
+        game.field.el.addEventListener('click', self.startLevel(game));
+      }
+
+      clearInterval(checkForClear);
+    }
+  }, 1000);
+};
 
 function launchSequence(game) {
   game.launchSession.ballNum ++;

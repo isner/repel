@@ -48,6 +48,6 @@ function startLevel(game) {
     game.launchSession = new LaunchSession(game);
     game.launchSession.start();
   }
-
   return start;
+
 }
