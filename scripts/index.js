@@ -3,15 +3,19 @@
  * Module dependencies.
  */
 
-var startLevel = require('./start-level');
+var configAudio = require('./config-audio');
+var Game = require('./game');
 
-var game = require('./prepare-game');
+/**
+ * Create and configure game.
+ */
 
-// Set field level to default
-game.field.levelNum = game.config.startLevel;
+var game = new Game();
 
-// Message shows upcoming level number
-game.field.nextLevMsg.innerHTML = game.field.levelNum + 1;
+game.field.resize();
 
-// User clicks to continue
-game.field.el.addEventListener('click', startLevel(game));
+/**
+ * Set volume of audio elements.
+ */
+
+configAudio();

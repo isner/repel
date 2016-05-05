@@ -58,3 +58,7 @@ gulp.task('sounds', function () {
   gulp.src('sounds/*.{wav,aif}')
     .pipe(gulp.dest(path.join(BUILD_DIR, 'sounds')));
 });
+
+gulp.task('watch', function () {
+  gulp.watch('scripts/*', ['scripts']);
+});

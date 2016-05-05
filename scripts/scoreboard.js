@@ -15,26 +15,41 @@ module.exports = Scoreboard;
 /**
  * Create a new instance of `Scoreboard`.
  *
- * Requires an element matching '#scoreboard'.
+ * @return {Scoreboard}
+ * @api public
  */
 
 function Scoreboard() {
   this.el = document.getElementById('scoreboard');
-  this.ballNum = query('span.ballNum');
   this.ballTot = query('span.ballTot');
   this.levelNum = query('span.levNum');
   this.score = query('span.score');
 
-  this.setTotalBallNum = function () {
-    this.ballTot.innerHTML = '&nbsp;of&nbsp;' + config.totalBalls;
-  };
-
-  this.setLevelNum = function (levelNum) {
-    this.levelNum.innerHTML = levelNum;
-  };
-
-  this.increaseScore = function (by) {
-    this.score.innerHTML = parseInt(this.score.innerHTML, 10) + by;
-  };
-
 }
+
+Scoreboard.prototype.setTotalBallNum = function () {
+  this.ballTot.innerHTML = config.totalBalls;
+  return this;
+};
+
+Scoreboard.prototype.setLevelNum = function (levelNum) {
+  this.levelNum.innerHTML = levelNum;
+  return this;
+};
+
+Scoreboard.prototype.increaseScore = function (by) {
+  this.score.innerHTML = parseInt(this.score.innerHTML, 10) + by;
+  return this;
+};
+
+/**
+ * Sets the score to a given `num`.
+ *
+ * @param {Number} num
+ * @api public
+ */
+
+Scoreboard.prototype.setScore = function (num) {
+  this.score.innerHTML = num;
+  return this;
+};

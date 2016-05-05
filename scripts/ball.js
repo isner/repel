@@ -31,7 +31,7 @@ function Ball(field) {
   this.bank = document.querySelector(config.banks[this.bankIndex]);
 
   // Pick a bank offest distance
-  this.bankOffset = Math.floor((Math.random() * (this.field.dimension - 100)) + 50);
+  this.bankOffset = Math.floor((Math.random() * (this.field.size - 100)) + 50);
 
   // Position the ball in the bank
   if (this.bankIndex === 0) { // Top
@@ -40,10 +40,10 @@ function Ball(field) {
 
   } else if (this.bankIndex === 1) { // Right
     this.el.style.top = this.bankOffset + 'px';
-    this.el.style.left = this.field.dimension + 'px';
+    this.el.style.left = this.field.size + 'px';
 
   } else if (this.bankIndex === 2) { // Bottom
-    this.el.style.top = this.field.dimension + 'px';
+    this.el.style.top = this.field.size + 'px';
     this.el.style.left = this.bankOffset + 'px';
 
   } else if (this.bankIndex === 3) { // Left
@@ -154,8 +154,8 @@ Ball.prototype.collide = function (player) {
 Ball.prototype.isHitBank = function () {
   var bankPositions = {
     'top': 20 + this.balloon.radius,
-    'right': config.dimension - 20 - this.balloon.radius,
-    'bottom': config.dimension - 20 - this.balloon.radius,
+    'right': config.size - 20 - this.balloon.radius,
+    'bottom': config.size - 20 - this.balloon.radius,
     'left': 20 + this.balloon.radius
   };
 

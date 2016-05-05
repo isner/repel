@@ -15,7 +15,6 @@ module.exports = LaunchSession;
 
 function LaunchSession(game) {
   this.game = game;
-  this.startLevel = require('./start-level');
   this.ballNum = 0;
 }
 
@@ -39,13 +38,10 @@ LaunchSession.prototype.end = function () {
       game.field.message.classList.remove('hide');
 
       if (game.healthbar.isEmpty()) {
-        // Game over
-        game.field.topRow.innerHTML = 'Game over';
-        game.field.bottomRow.innerHTML = 'Refresh the page to try again';
+        game.reset();
       }
       else {
-        // Bind 'click' event to start level
-        game.field.el.addEventListener('click', self.startLevel(game));
+        game.nextLevel();
       }
 
       clearInterval(checkForClear);
@@ -55,7 +51,6 @@ LaunchSession.prototype.end = function () {
 
 function launchSequence(game) {
   game.launchSession.ballNum ++;
-  game.scoreboard.ballNum.innerHTML = game.launchSession.ballNum;
 
   // Create a ball
   var ball = new Ball(game.field);

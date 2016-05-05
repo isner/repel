@@ -1,7 +1,7 @@
 
 module.exports = {
 
-  dimension: 0,     // px, default: 0
+  size: 0,          // px, default: 0
 
   player: {
     diameter: 50,   // px, default: 50
@@ -9,24 +9,14 @@ module.exports = {
     maxCharge: 5
   },
 
-  /**
-   * Test mode.
-   */
-
-  launchRate: 800,
+  startLevel: 1,
   totalBalls: 10,
-
-  /**
-   * Melissa mode.
-   */
-
-  // launchRate: 400,
-  // totalBalls: 50,
-
+  launchRate: 760,
+  launchRateBump: 40,     // millisecond decrease per level
+  thrust: 1.2,            // No less than 1.0
+  thrustBump: 0.1,        // px/sec increase per level
   lifespan: 1000 * 20,    // 1000 * {secs},
   movementFPS: 1000 / 60, // 1000 / {FPS}
-  thrust: 1.1,            // No less than 1.0
-  startLevel: 0,
 
   banks: [
     '.bank.top',
@@ -37,6 +27,7 @@ module.exports = {
 
   /**
    * Generates a random integer between min & max.
+   *
    * @param   {Number}  min  Lowest desired result.
    * @param   {Number}  max  Highest desired result.
    * @return  {Number}       The random result.

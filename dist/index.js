@@ -88,76 +88,176 @@
  * Module dependencies.
  */
 
-var startLevel = require('./start-level');
+var configAudio = require('./config-audio');
+var Game = require('./game');
 
-var game = require('./prepare-game');
+/**
+ * Create and configure game.
+ */
 
-// Set field level to default
-game.field.levelNum = game.config.startLevel;
+var game = new Game();
 
-// Message shows upcoming level number
-game.field.nextLevMsg.innerHTML = game.field.levelNum + 1;
+game.field.resize();
 
-// User clicks to continue
-game.field.el.addEventListener('click', startLevel(game));
+/**
+ * Set volume of audio elements.
+ */
 
-}, {"./start-level":2,"./prepare-game":3}],
+configAudio();
+
+}, {"./config-audio":2,"./game":3}],
 2: [function(require, module, exports) {
+
+var audioSelectors = [
+  'sfx-beep-1',
+  'sfx-beep-2',
+  'sfx-beep-3',
+  'sfx-beep-4',
+  'sfx-beep-5',
+  'sfx-beep-high-1',
+  'sfx-beep-high-2',
+  'sfx-beep-high-3',
+  'sfx-beep-high-4',
+  'sfx-beep-high-5',
+];
+
+module.exports = configAudio;
+
+function configAudio() {
+  audioSelectors.forEach(function (selector) {
+    var el = document.getElementById(selector);
+    el.volume = 0.2;
+  });
+}
+
+}, {}],
+3: [function(require, module, exports) {
 
 /**
  * Module dependencies.
  */
 
 var LaunchSession = require('./launch-session');
+var Emitter = require('component/emitter');
+var classes = require('component/classes');
+var Scoreboard = require('./scoreboard');
 var Healthbar = require('./healthbar');
-
-module.exports = startLevel;
+var query = require('component/query');
+var config = require('./config');
+var Player = require('./player');
+var Field = require('./field');
 
 /**
- * Generates a startLevel function for a given `Game#`.
- *
- * @param  {Game} game
+ * Expose `Game`.
  */
 
-function startLevel(game) {
-  function start() {
-    game.field.levelNum ++;
+module.exports = Game;
 
-    // Increase the thrust
-    game.config.thrust += 0.1;
-    console.log('config.thrust: ', game.config.thrust);
+/**
+ * Create a new instance of `Game`.
+ *
+ * @return {Game}
+ * @api public
+ */
 
-    // Increase the launch rate
-    game.config.launchRate -= 40;
-    console.log('config.launchRate: ', game.config.launchRate);
+function Game() {
+  this.config = config;
 
-    // Prepare the scoreboard
-    game.scoreboard.setTotalBallNum();
-    game.scoreboard.setLevelNum(game.field.levelNum);
+  this.status = 0; // "idle"
+  this.setLevel(this.config.startLevel);
+  this.baseThrust = this.config.thrust;
+  this.baseLaunchRate = this.config.launchRate;
 
-    // Destroy, create and replenish the healthbar
-    var healthEl = document.getElementById('healthbar');
-    game.healthbar = new Healthbar(healthEl);
-    game.healthbar.replenishAll();
+  var player = this.player = new Player();
+  var game = this;
 
-    // Hide the message
-    game.field.message.classList.add('hide');
+  this.field = new Field()
+    .on('mouseenter', player.show.bind(player))
+    .on('mouseleave', player.hide.bind(player))
+    .on('mousemove', function (coords) {
+      player.moveTo(coords);
+    })
+    .on('click', function () {
+      if (game.status === 0) {
+        game.startLevel();
+      }
+    })
+    .on('resize', function (size) {
+      game.config.size = size;
+    })
+    .bannerText('Level ' + this.level);
 
-    // Display the next level number on the scoreboard
-    game.field.nextLevMsg.innerHTML = game.field.levelNum + 1;
-
-    // Unbind the continue 'click' event on the field
-    game.field.el.removeEventListener('click', start);
-
-    // Start a launch session
-    game.launchSession = new LaunchSession(game);
-    game.launchSession.start();
-  }
-  return start;
-
+  this.scoreboard = new Scoreboard()
+    .setLevelNum(this.level);
+    // .setTotalBallNum(this.config.totalBalls);
 }
 
-}, {"./launch-session":4,"./healthbar":5}],
+/**
+ * Mixin `Emitter`.
+ */
+
+Emitter(Game.prototype);
+
+/**
+ * Set the game's level.
+ *
+ * @param {Number} num
+ */
+
+Game.prototype.setLevel = function (num) {
+  this.level = num;
+};
+
+Game.prototype.nextLevel = function () {
+  // Bump thrust and lauch rate
+  this.config.thrust += this.config.thrustBump;
+  this.config.thrust = parseFloat(this.config.thrust.toFixed(1));
+  this.config.launchRate -= this.config.launchRateBump;
+
+  this.setLevel(this.level + 1);
+  this.status = 0; // "idle"
+  this.field.bannerText('Level ' + this.level);
+  this.field.bannerSubtext('Click anywhere to continue');
+};
+
+Game.prototype.reset = function () {
+  this.config.thrust = this.baseThrust;
+  this.config.launchRate = this.baseLaunchRate;
+  this.setLevel(this.config.startLevel);
+  this.status = 0; // "idle"
+  this.field.bannerText('Game over');
+  this.field.bannerSubtext('Click anywhere to try again');
+};
+
+Game.prototype.startLevel = function () {
+  this.status = 1; // "in progress"
+
+  console.log('speed:', this.config.thrust);
+  console.log(' rate:', this.config.launchRate);
+
+  // Prepare the scoreboard
+  this.scoreboard.setLevelNum(this.level);
+  if (this.level == 1) {
+    this.scoreboard.setScore(0);
+  }
+
+  // Destroy, create and replenish the healthbar
+  var healthEl = query('#healthbar');
+  this.healthbar = new Healthbar(healthEl);
+  this.healthbar.replenishAll();
+
+  // Hide the message
+  classes(this.field.message).add('hide');
+
+  // Display the next level number on the scoreboard
+  this.field.nextLevMsg.innerHTML = this.level + 1;
+
+  // Start a launch session
+  this.launchSession = new LaunchSession(this);
+  this.launchSession.start();
+};
+
+}, {"./launch-session":4,"component/emitter":5,"component/classes":6,"./scoreboard":7,"./healthbar":8,"component/query":9,"./config":10,"./player":11,"./field":12}],
 4: [function(require, module, exports) {
 
 /**
@@ -176,7 +276,6 @@ module.exports = LaunchSession;
 
 function LaunchSession(game) {
   this.game = game;
-  this.startLevel = require('./start-level');
   this.ballNum = 0;
 }
 
@@ -200,13 +299,10 @@ LaunchSession.prototype.end = function () {
       game.field.message.classList.remove('hide');
 
       if (game.healthbar.isEmpty()) {
-        // Game over
-        game.field.topRow.innerHTML = 'Game over';
-        game.field.bottomRow.innerHTML = 'Refresh the page to try again';
+        game.reset();
       }
       else {
-        // Bind 'click' event to start level
-        game.field.el.addEventListener('click', self.startLevel(game));
+        game.nextLevel();
       }
 
       clearInterval(checkForClear);
@@ -216,7 +312,6 @@ LaunchSession.prototype.end = function () {
 
 function launchSequence(game) {
   game.launchSession.ballNum ++;
-  game.scoreboard.ballNum.innerHTML = game.launchSession.ballNum;
 
   // Create a ball
   var ball = new Ball(game.field);
@@ -322,8 +417,8 @@ function launchSequence(game) {
   }
 }
 
-}, {"./ball-explosion":6,"component/classes":7,"./ball":8,"./start-level":2}],
-6: [function(require, module, exports) {
+}, {"./ball-explosion":13,"component/classes":6,"./ball":14}],
+13: [function(require, module, exports) {
 
 /**
  * Expose `BallExplosion`.
@@ -361,7 +456,7 @@ function BallExplosion(ball, game) {
 }
 
 }, {}],
-7: [function(require, module, exports) {
+6: [function(require, module, exports) {
 /**
  * Module dependencies.
  */
@@ -554,8 +649,8 @@ ClassList.prototype.contains = function(name){
     : !! ~index(this.array(), name);
 };
 
-}, {"indexof":9,"component-indexof":9}],
-9: [function(require, module, exports) {
+}, {"indexof":15,"component-indexof":15}],
+15: [function(require, module, exports) {
 module.exports = function(arr, obj){
   if (arr.indexOf) return arr.indexOf(obj);
   for (var i = 0; i < arr.length; ++i) {
@@ -564,7 +659,7 @@ module.exports = function(arr, obj){
   return -1;
 };
 }, {}],
-8: [function(require, module, exports) {
+14: [function(require, module, exports) {
 
 /**
  * Module dependencies.
@@ -598,7 +693,7 @@ function Ball(field) {
   this.bank = document.querySelector(config.banks[this.bankIndex]);
 
   // Pick a bank offest distance
-  this.bankOffset = Math.floor((Math.random() * (this.field.dimension - 100)) + 50);
+  this.bankOffset = Math.floor((Math.random() * (this.field.size - 100)) + 50);
 
   // Position the ball in the bank
   if (this.bankIndex === 0) { // Top
@@ -607,10 +702,10 @@ function Ball(field) {
 
   } else if (this.bankIndex === 1) { // Right
     this.el.style.top = this.bankOffset + 'px';
-    this.el.style.left = this.field.dimension + 'px';
+    this.el.style.left = this.field.size + 'px';
 
   } else if (this.bankIndex === 2) { // Bottom
-    this.el.style.top = this.field.dimension + 'px';
+    this.el.style.top = this.field.size + 'px';
     this.el.style.left = this.bankOffset + 'px';
 
   } else if (this.bankIndex === 3) { // Left
@@ -721,8 +816,8 @@ Ball.prototype.collide = function (player) {
 Ball.prototype.isHitBank = function () {
   var bankPositions = {
     'top': 20 + this.balloon.radius,
-    'right': config.dimension - 20 - this.balloon.radius,
-    'bottom': config.dimension - 20 - this.balloon.radius,
+    'right': config.size - 20 - this.balloon.radius,
+    'bottom': config.size - 20 - this.balloon.radius,
     'left': 20 + this.balloon.radius
   };
 
@@ -744,8 +839,8 @@ Ball.prototype.isHitGoal = function (hitBankIndex) {
   return this.bankIndex === hitBankIndex - 1;
 };
 
-}, {"./balloon":10,"./config":11}],
-10: [function(require, module, exports) {
+}, {"./balloon":16,"./config":10}],
+16: [function(require, module, exports) {
 
 /**
  * Module dependencies.
@@ -760,7 +855,7 @@ var config = require('./config');
 module.exports = Balloon;
 
 /**
- * Creates a new instance of `Ball`.
+ * Creates a new instance of `Balloon`.
  *
  * @param {Ball} ball
  */
@@ -788,12 +883,12 @@ function Balloon(ball) {
 
 }
 
-}, {"./config":11}],
-11: [function(require, module, exports) {
+}, {"./config":10}],
+10: [function(require, module, exports) {
 
 module.exports = {
 
-  dimension: 0,     // px, default: 0
+  size: 0,          // px, default: 0
 
   player: {
     diameter: 50,   // px, default: 50
@@ -801,24 +896,14 @@ module.exports = {
     maxCharge: 5
   },
 
-  /**
-   * Test mode.
-   */
-
-  launchRate: 800,
+  startLevel: 1,
   totalBalls: 10,
-
-  /**
-   * Melissa mode.
-   */
-
-  // launchRate: 400,
-  // totalBalls: 50,
-
+  launchRate: 760,
+  launchRateBump: 40,     // millisecond decrease per level
+  thrust: 1.2,            // No less than 1.0
+  thrustBump: 0.1,        // px/sec increase per level
   lifespan: 1000 * 20,    // 1000 * {secs},
   movementFPS: 1000 / 60, // 1000 / {FPS}
-  thrust: 1.1,            // No less than 1.0
-  startLevel: 0,
 
   banks: [
     '.bank.top',
@@ -829,6 +914,7 @@ module.exports = {
 
   /**
    * Generates a random integer between min & max.
+   *
    * @param   {Number}  min  Lowest desired result.
    * @param   {Number}  max  Highest desired result.
    * @return  {Number}       The random result.
@@ -841,265 +927,6 @@ module.exports = {
 
 }, {}],
 5: [function(require, module, exports) {
-
-var globesSelector = '.globe';
-
-module.exports = Healthbar;
-
-function Healthbar(element) {
-  this.el = element;
-  this.globes = document.querySelectorAll(globesSelector, this.el);
-}
-
-Healthbar.prototype.replenishAll = function () {
-  var len = this.globes.length;
-  for (var i = 0; i < len; i++) {
-    this.globes[i].classList.remove('empty');
-    this.globes[i].classList.add('full');
-  }
-};
-
-Healthbar.prototype.depleteOne = function () {
-  var len = this.globes.length;
-  for (var i = len - 1; i >= 0; i--) {
-    if (this.globes[i].className.indexOf('full') > -1) {
-      this.globes[i].classList.remove('full');
-      this.globes[i].classList.add('empty');
-      break;
-    }
-  }
-};
-
-Healthbar.prototype.isEmpty = function () {
-  var globeCount = this.globes.length;
-  var emptyCount = document.querySelectorAll('#healthbar .globe.empty').length;
-  return globeCount === emptyCount;
-};
-
-}, {}],
-3: [function(require, module, exports) {
-
-/**
- * Module dependencies.
- */
-
-var Game = require('./game');
-
-/**
- * Create `Game#` singleton.
- */
-
-var game = new Game();
-
-/**
- * Expose `Game#`.
- */
-
-module.exports = game;
-
-// Set the initial field size
-var dimension = getAvailableDimension();
-resizeField(dimension);
-
-/**
- * Determines the smaller of the two body dimensions
- * height and width.
- *
- * @return {Number}
- * @api private
- */
-
-function getAvailableDimension() {
-  var bodyHeight = document.body.clientHeight;
-  var bodyWidth = document.body.clientWidth;
-  return bodyWidth >= bodyHeight
-    ? bodyHeight
-    : bodyWidth;
-}
-
-/**
- * Adjusts the size of the playing field.
- *
- * TODO Move to ./field.js
- *
- * @param {Number} dimension
- * @api private
- */
-
-function resizeField(dimension) {
-  game.field.el.style.height = dimension + 'px';
-  game.field.el.style.width = dimension + 'px';
-  // Update the dimension property of the Field object
-  // as well as the config file
-  game.field.dimension = game.config.dimension = dimension;
-}
-
-/**
- * Configure audio.
- */
-
-require('./config-audio')();
-
-}, {"./game":12,"./config-audio":13}],
-12: [function(require, module, exports) {
-
-/**
- * Module dependencies.
- */
-
-var Scoreboard = require('./scoreboard');
-var Player = require('./player');
-var Field = require('./field');
-
-module.exports = Game;
-
-function Game() {
-  this.config = require('./config');
-
-  var player = this.player = new Player();
-
-  var field = this.field = new Field()
-  .on('mouseenter', player.show.bind(player))
-  .on('mouseleave', player.hide.bind(player))
-  .on('mousemove', function (coords) {
-    player.moveTo(coords);
-  });
-
-  this.scoreboard = new Scoreboard();
-}
-
-}, {"./scoreboard":14,"./player":15,"./field":16,"./config":11}],
-14: [function(require, module, exports) {
-
-/**
- * Module dependencies.
- */
-
-var query = require('component/query');
-var config = require('./config');
-
-/**
- * Expose `Scoreboard`.
- */
-
-module.exports = Scoreboard;
-
-/**
- * Create a new instance of `Scoreboard`.
- *
- * Requires an element matching '#scoreboard'.
- */
-
-function Scoreboard() {
-  this.el = document.getElementById('scoreboard');
-  this.ballNum = query('span.ballNum');
-  this.ballTot = query('span.ballTot');
-  this.levelNum = query('span.levNum');
-  this.score = query('span.score');
-
-  this.setTotalBallNum = function () {
-    this.ballTot.innerHTML = '&nbsp;of&nbsp;' + config.totalBalls;
-  };
-
-  this.setLevelNum = function (levelNum) {
-    this.levelNum.innerHTML = levelNum;
-  };
-
-  this.increaseScore = function (by) {
-    this.score.innerHTML = parseInt(this.score.innerHTML, 10) + by;
-  };
-
-}
-
-}, {"component/query":17,"./config":11}],
-17: [function(require, module, exports) {
-function one(selector, el) {
-  return el.querySelector(selector);
-}
-
-exports = module.exports = function(selector, el){
-  el = el || document;
-  return one(selector, el);
-};
-
-exports.all = function(selector, el){
-  el = el || document;
-  return el.querySelectorAll(selector);
-};
-
-exports.engine = function(obj){
-  if (!obj.one) throw new Error('.one callback required');
-  if (!obj.all) throw new Error('.all callback required');
-  one = obj.one;
-  exports.all = obj.all;
-  return exports;
-};
-
-}, {}],
-15: [function(require, module, exports) {
-
-/**
- * Module dependencies.
- */
-
-var Emitter = require('component/emitter');
-var classes = require('component/classes');
-var events = require('component/events');
-var query = require('component/query');
-var config = require('./config');
-
-var HIDDEN_CLASS = 'hidden';
-
-/**
- * Expose `Player`.
- */
-
-module.exports = Player;
-
-/**
- * Creates a new instance of `Player`.
- *
- * Requires an element matching '#player'.
- */
-
-function Player() {
-  this.el = query('#player');
-  this.center = query('.center', this.el);
-
-  this.diameter = config.player.diameter;
-  this.radius = this.diameter / 2;
-
-  this.el.style.width = this.diameter + 'px';
-  this.el.style.height = this.diameter + 'px';
-  this.el.style.borderRadius = this.radius + 'px';
-
-  this.position = {};
-  this.velocity = {};
-}
-
-/**
- * Mixin `Emitter`.
- */
-
-Emitter(Player.prototype);
-
-Player.prototype.show = function () {
-  classes(this.el).remove(HIDDEN_CLASS);
-};
-
-Player.prototype.hide = function () {
-  classes(this.el).add(HIDDEN_CLASS);
-};
-
-Player.prototype.moveTo = function (coords) {
-  this.el.style.top = (coords.y - this.radius).toString() + 'px';
-  this.position.top = coords.y;
-  this.el.style.left = (coords.x - this.radius).toString() + 'px';
-  this.position.left = coords.x;
-};
-
-}, {"component/emitter":18,"component/classes":7,"component/events":19,"component/query":17,"./config":11}],
-18: [function(require, module, exports) {
 
 /**
  * Expose `Emitter`.
@@ -1265,7 +1092,189 @@ Emitter.prototype.hasListeners = function(event){
 };
 
 }, {}],
-19: [function(require, module, exports) {
+7: [function(require, module, exports) {
+
+/**
+ * Module dependencies.
+ */
+
+var query = require('component/query');
+var config = require('./config');
+
+/**
+ * Expose `Scoreboard`.
+ */
+
+module.exports = Scoreboard;
+
+/**
+ * Create a new instance of `Scoreboard`.
+ *
+ * @return {Scoreboard}
+ * @api public
+ */
+
+function Scoreboard() {
+  this.el = document.getElementById('scoreboard');
+  this.ballTot = query('span.ballTot');
+  this.levelNum = query('span.levNum');
+  this.score = query('span.score');
+
+}
+
+Scoreboard.prototype.setTotalBallNum = function () {
+  this.ballTot.innerHTML = config.totalBalls;
+  return this;
+};
+
+Scoreboard.prototype.setLevelNum = function (levelNum) {
+  this.levelNum.innerHTML = levelNum;
+  return this;
+};
+
+Scoreboard.prototype.increaseScore = function (by) {
+  this.score.innerHTML = parseInt(this.score.innerHTML, 10) + by;
+  return this;
+};
+
+/**
+ * Sets the score to a given `num`.
+ *
+ * @param {Number} num
+ * @api public
+ */
+
+Scoreboard.prototype.setScore = function (num) {
+  this.score.innerHTML = num;
+  return this;
+};
+
+}, {"component/query":9,"./config":10}],
+9: [function(require, module, exports) {
+function one(selector, el) {
+  return el.querySelector(selector);
+}
+
+exports = module.exports = function(selector, el){
+  el = el || document;
+  return one(selector, el);
+};
+
+exports.all = function(selector, el){
+  el = el || document;
+  return el.querySelectorAll(selector);
+};
+
+exports.engine = function(obj){
+  if (!obj.one) throw new Error('.one callback required');
+  if (!obj.all) throw new Error('.all callback required');
+  one = obj.one;
+  exports.all = obj.all;
+  return exports;
+};
+
+}, {}],
+8: [function(require, module, exports) {
+
+var globesSelector = '.globe';
+
+module.exports = Healthbar;
+
+function Healthbar(element) {
+  this.el = element;
+  this.globes = document.querySelectorAll(globesSelector, this.el);
+}
+
+Healthbar.prototype.replenishAll = function () {
+  var len = this.globes.length;
+  for (var i = 0; i < len; i++) {
+    this.globes[i].classList.remove('empty');
+    this.globes[i].classList.add('full');
+  }
+};
+
+Healthbar.prototype.depleteOne = function () {
+  var len = this.globes.length;
+  for (var i = len - 1; i >= 0; i--) {
+    if (this.globes[i].className.indexOf('full') > -1) {
+      this.globes[i].classList.remove('full');
+      this.globes[i].classList.add('empty');
+      break;
+    }
+  }
+};
+
+Healthbar.prototype.isEmpty = function () {
+  var globeCount = this.globes.length;
+  var emptyCount = document.querySelectorAll('#healthbar .globe.empty').length;
+  return globeCount === emptyCount;
+};
+
+}, {}],
+11: [function(require, module, exports) {
+
+/**
+ * Module dependencies.
+ */
+
+var Emitter = require('component/emitter');
+var classes = require('component/classes');
+var events = require('component/events');
+var query = require('component/query');
+var config = require('./config');
+
+var HIDDEN_CLASS = 'hidden';
+
+/**
+ * Expose `Player`.
+ */
+
+module.exports = Player;
+
+/**
+ * Creates a new instance of `Player`.
+ *
+ * Requires an element matching '#player'.
+ */
+
+function Player() {
+  this.el = query('#player');
+  this.center = query('.center', this.el);
+
+  this.diameter = config.player.diameter;
+  this.radius = this.diameter / 2;
+
+  this.el.style.width = this.diameter + 'px';
+  this.el.style.height = this.diameter + 'px';
+  this.el.style.borderRadius = this.radius + 'px';
+
+  this.position = {};
+  this.velocity = {};
+}
+
+/**
+ * Mixin `Emitter`.
+ */
+
+Emitter(Player.prototype);
+
+Player.prototype.show = function () {
+  classes(this.el).remove(HIDDEN_CLASS);
+};
+
+Player.prototype.hide = function () {
+  classes(this.el).add(HIDDEN_CLASS);
+};
+
+Player.prototype.moveTo = function (coords) {
+  this.el.style.top = (coords.y - this.radius).toString() + 'px';
+  this.position.top = coords.y;
+  this.el.style.left = (coords.x - this.radius).toString() + 'px';
+  this.position.left = coords.x;
+};
+
+}, {"component/emitter":5,"component/classes":6,"component/events":17,"component/query":9,"./config":10}],
+17: [function(require, module, exports) {
 
 /**
  * Module dependencies.
@@ -1452,8 +1461,8 @@ function parse(event) {
   }
 }
 
-}, {"event":20,"component-event":20,"delegate":21,"component-delegate":21}],
-20: [function(require, module, exports) {
+}, {"event":18,"component-event":18,"delegate":19,"component-delegate":19}],
+18: [function(require, module, exports) {
 var bind = window.addEventListener ? 'addEventListener' : 'attachEvent',
     unbind = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
     prefix = bind !== 'addEventListener' ? 'on' : '';
@@ -1490,7 +1499,7 @@ exports.unbind = function(el, type, fn, capture){
   return fn;
 };
 }, {}],
-21: [function(require, module, exports) {
+19: [function(require, module, exports) {
 /**
  * Module dependencies.
  */
@@ -1543,8 +1552,8 @@ exports.unbind = function(el, type, fn, capture){
   event.unbind(el, type, fn, capture);
 };
 
-}, {"closest":22,"component-closest":22,"event":20,"component-event":20}],
-22: [function(require, module, exports) {
+}, {"closest":20,"component-closest":20,"event":18,"component-event":18}],
+20: [function(require, module, exports) {
 /**
  * Module Dependencies
  */
@@ -1582,8 +1591,8 @@ function closest (el, selector, scope) {
   return matches(el, selector) ? el : null;
 }
 
-}, {"matches-selector":23,"component-matches-selector":23}],
-23: [function(require, module, exports) {
+}, {"matches-selector":21,"component-matches-selector":21}],
+21: [function(require, module, exports) {
 /**
  * Module dependencies.
  */
@@ -1635,8 +1644,8 @@ function match(el, selector) {
   return false;
 }
 
-}, {"query":17,"component-query":17}],
-16: [function(require, module, exports) {
+}, {"query":9,"component-query":9}],
+12: [function(require, module, exports) {
 
 /**
  * Module dependencies.
@@ -1646,6 +1655,7 @@ var Emitter = require('component/emitter');
 var classes = require('component/classes');
 var events = require('component/events');
 var query = require('component/query');
+var config = require('./config');
 
 /**
  * Expose `Field`.
@@ -1656,49 +1666,24 @@ module.exports = Field;
 /**
  * Create a new instance of `Field`.
  *
- * Requires an element matching '#field'.
+ * @return {Field}
+ * @api public
  */
 
 function Field() {
   this.el = query('#field');
-  this.levelNum = null;
+  this.levelNum = config.startLevel;
 
   this.events = events(this.el, this);
   this.events.bind('mouseenter');
   this.events.bind('mouseleave');
   this.events.bind('mousemove');
+  this.events.bind('click');
 
-  // User message
-  this.message = document.querySelector('div.message');
-  this.nextLevMsg = document.querySelector('span.nextLevNum');
-  this.topRow = this.message.querySelector('.top-row');
-  this.bottomRow = this.message.querySelector('.bottom-row');
-
-  // Score sound
-  this.scoreSoundVal = 1;
-  this.scoreSound = function () {
-    var audio = document.getElementById('sfx-beep-' + this.scoreSoundVal);
-
-    audio.play();
-
-    this.scoreSoundVal = this.scoreSoundVal < 5
-      ? this.scoreSoundVal + 1
-      : 1;
-
-  };
-
-  // Miss sound
-  this.missSoundVal = 1;
-  this.missSound = function () {
-    var audio = document.getElementById('sfx-beep-high-' + this.missSoundVal);
-
-    audio.play();
-
-    this.missSoundVal = this.missSoundVal < 5
-      ? this.missSoundVal + 1
-      : 1;
-
-  };
+  this.message = query('.message', this.el);
+  this.nextLevMsg = query('.nextLevNum', this.el);
+  this.topRow = query('.top-row', this.message);
+  this.bottomRow = query('.bottom-row', this.message);
 
 }
 
@@ -1707,6 +1692,21 @@ function Field() {
  */
 
 Emitter(Field.prototype);
+
+/**
+ * Size the field to match the available space.
+ *
+ * @param  {Number} size
+ * @return {Field}
+ */
+
+Field.prototype.resize = function () {
+  this.size = getAvailableSize();
+  this.el.style.height = this.size + 'px';
+  this.el.style.width = this.size + 'px';
+  this.emit('resize', this.size);
+  return this;
+};
 
 Field.prototype.onmouseenter = function () {
   this.emit('mouseenter');
@@ -1724,29 +1724,67 @@ Field.prototype.onmousemove = function (e) {
   });
 };
 
-}, {"component/emitter":18,"component/classes":7,"component/events":19,"component/query":17}],
-13: [function(require, module, exports) {
+Field.prototype.onclick = function () {
+  this.emit('click');
+};
 
-var audioSelectors = [
-  'sfx-beep-1',
-  'sfx-beep-2',
-  'sfx-beep-3',
-  'sfx-beep-4',
-  'sfx-beep-5',
-  'sfx-beep-high-1',
-  'sfx-beep-high-2',
-  'sfx-beep-high-3',
-  'sfx-beep-high-4',
-  'sfx-beep-high-5',
-];
+Field.prototype.bannerText = function (str) {
+  this.topRow.innerHTML = str;
+  return this;
+};
 
-module.exports = configAudio;
+Field.prototype.bannerSubtext = function (str) {
+  this.bottomRow.innerHTML = str;
+  return this;
+};
 
-function configAudio() {
-  audioSelectors.forEach(function (selector) {
-    var el = document.getElementById(selector);
-    el.volume = 0.2;
-  });
+Field.prototype.scoreSound = function () {
+  var audioEl = query('#sfx-beep-' + randomAudio());
+  audioEl.play();
+};
+
+Field.prototype.missSound = function () {
+  var audioEl = query('#sfx-beep-high-' + randomAudio());
+  audioEl.play();
+};
+
+/**
+ * Determines the smaller of the two body dimensions
+ * height and width.
+ *
+ * @return {Number}
+ * @api private
+ */
+
+function getAvailableSize() {
+  var bodyHeight = document.body.clientHeight;
+  var bodyWidth = document.body.clientWidth;
+  return bodyWidth >= bodyHeight
+    ? bodyHeight
+    : bodyWidth;
 }
 
-}, {}]}, {}, {"1":""})
+/**
+ * Gets a random number between 1 and 5.
+ *
+ * @return {Number}
+ */
+
+function randomAudio() {
+  return randomBetween(1, 5);
+}
+
+/**
+ * Returns a random integer between `min` and `max` (inclusive).
+ *
+ * @param  {Number} min
+ * @param  {Number} max
+ * @return {Number}
+ * @api private
+ */
+
+function randomBetween(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+}, {"component/emitter":5,"component/classes":6,"component/events":17,"component/query":9,"./config":10}]}, {}, {"1":""})

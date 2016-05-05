@@ -12,7 +12,7 @@ var config = require('./config');
 module.exports = Balloon;
 
 /**
- * Creates a new instance of `Ball`.
+ * Creates a new instance of `Balloon`.
  *
  * @param {Ball} ball
  */
