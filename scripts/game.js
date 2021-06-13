@@ -4,11 +4,11 @@
  */
 
 var LaunchSession = require('./launch-session');
-var Emitter = require('component/emitter');
-var classes = require('component/classes');
+var Emitter = require('component-emitter');
+var classes = require('component-classes');
 var Scoreboard = require('./scoreboard');
 var Healthbar = require('./healthbar');
-var query = require('component/query');
+var query = require('component-query');
 var config = require('./config');
 var Player = require('./player');
 var Field = require('./field');

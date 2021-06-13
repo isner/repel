@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var query = require('component/query');
+var query = require('component-query');
 var config = require('./config');
 
 /**

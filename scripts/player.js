@@ -3,10 +3,10 @@
  * Module dependencies.
  */
 
-var Emitter = require('component/emitter');
-var classes = require('component/classes');
-var events = require('component/events');
-var query = require('component/query');
+var Emitter = require('component-emitter');
+var classes = require('component-classes');
+var events = require('component-events');
+var query = require('component-query');
 var config = require('./config');
 
 var HIDDEN_CLASS = 'hidden';

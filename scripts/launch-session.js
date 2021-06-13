@@ -4,7 +4,7 @@
  */
 
 var BallExplosion = require('./ball-explosion');
-var classes = require('component/classes');
+var classes = require('component-classes');
 var Ball = require('./ball');
 
 /**
