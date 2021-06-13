@@ -13,7 +13,8 @@
   ],
   "scripts": {
     "build": "gulp && yarn bundle",
-    "bundle": "browserify scripts/index.js -o dist/index.js"
+    "bundle": "browserify scripts/index.js -o dist/index.js",
+    "prepare": "yarn build"
   },
   "devDependencies": {
     "browserify": "^17.0.0",
