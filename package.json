@@ -4,6 +4,9 @@
   "repository": "github:isner/repel",
   "license": "UNLICENSED",
   "author": "Matt Isner <isnerms@gmail.com>",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "browser": "dist/index.html",
   "files": [
     "dist/"
