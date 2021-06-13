@@ -4,6 +4,10 @@
   "repository": "github:isner/repel",
   "license": "UNLICENSED",
   "author": "Matt Isner <isnerms@gmail.com>",
+  "browser": "dist/index.html",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "build": "gulp && yarn bundle",
     "bundle": "browserify scripts/index.js -o dist/index.js"
